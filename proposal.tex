@@ -1,0 +1,133 @@
+\documentclass[12pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage{url}
+
+\title{Quantification of Uncertainty in Medical Image Segmentation}
+\author{Hao Wang, 11812301}
+\date{October 2020}
+
+\begin{document}
+
+\maketitle
+\section*{Abstract}
+\textbf{TODO}
+\section{Introduction}
+\paragraph{}
+Recent development of deep learning algorithms has largely contributed to
+the performance gain on natural image analysis, of which lots
+of algorithms has been proposed to address its classification and semantic
+segmentation problems and large-scale datasets with abundant annotations have been
+carried out\cite{nair_precup_arnold_arbel_2020}.
+However, due to
+% inter-reader variations need more details and background
+both lack of annotations and high inter-reader variations\cite{zhang2020disentangling}
+in medical domain, the application of deep models into clinical diagnosis,
+which is known to be sensitive to false-positive and true-negative cases that may leads
+to severe consequences, is currently not feasible. 
+For instance, the inter-annotator difference of glioblastoma segmentation
+is pointed out to be in the range of 74-84\% \cite{6975210}.
+Researches on inter-observer variance also found out
+the large and wide-existing inconsistency among annotations of biomedical structures
+\cite{Variability2019}\cite{interobserver2018}. Such high-variance dataset 
+could result in poor performance of supervised machine learning algorithms,
+which are known to be highly dependent on the quality of data as well as their annotations.
+To overcome it, the most straight forward and widely-adopted method 
+is take the majority vote of experts' annotations, treating every 
+experts' opinions equally significant\cite{6975210}, while STAPLE proposed by \cite{STAPLE} 
+evaluates reliability of annotators and assigns weights to each of them when 
+fusing annotations accordingly.
+Lately, a challenge about Quantification of uncertainty 
+in biomedical image segmentation has been carried
+out on the purpose of seeking measures to quantify the uncertainty of 
+medical image annotation. A discrete approximation of the uncertainty is also
+proposed for the assessment of participants' results, which
+takes in the averaged ground truth and the provided predicted probability map of a task
+and computes and averages the dice score of the threshold of them with
+discrete threshold values\cite{qubiq}. A high averaged dice score is then considered to 
+be an indicating of good quantification of the inter-observer uncertainty.
+Therefore, our goal is to firstly achieve a high score in the challenge. 
+Then, since taking threshold averaged dice score treats certain and uncertain pixels equally 
+and ignores the fact that most uncertain pixels lies around 
+the contour of the lesion area, we are expecting to have a
+better evaluation method for inter-reader variations. 
+Finally, based on the metrics we derive, a further
+optimized method could be explored and proposed.
+\section{Related Works}
+\paragraph{}
+Uncertainty in deep learning can be inclusively divided into \textit{Aleatoric}
+uncertainty and \textit{Epistemic} uncertainty \cite{kendall2017uncertainties}.
+\textit{Aleatoric} uncertainty or data uncertainty typically occurs during data sampling and
+observation error of observer and is irreducible even feeded with more data, which shares a
+close connection with inter-observer variations. As for \textit{epistemic}
+uncertainty, it refers to ambiguity of model prediction that can be reduce by feeding abundant data.
+An example of it is that a model trained on only part of a dataset may over-confidently
+predict unseen data into wrong classes. Recent development on bayesian neural network has made it possible
+to quantify the \textit{epistemic} uncertainty by replacing scalar parameters with distributions such that 
+the model outputs differs for each forward pass during test stage and that output variance reflects the 
+certainty of the model. Such uncertainty could also be exploited to estimate \textit{aleatoric} uncertainty.
+\cite{kohl2019probabilistic} proposed a method that involve uncertainties by
+deploying variational auto-encoder(VAE) into U-net, the widely used model in medical image segmentation. 
+The VAE here accounts for variations of annotations and represents an estimation of joint distribution that 
+includes every pixels of the segmentation map. The framework is capable of providing multiple segmentation 
+hypothesis with each estimating knowledge of an expert.
+However, one of drawbacks of the bayesian approach is of the extra computation
+and excessive training time. Some recent studies proposed to use a dropout network,
+during the testing stage of which, the dropout is kept, predictions are sampled
+using Monte Carlo methods and various uncertainties are computed based on the sampled results.
+It is also reported that Effective performance can be achieved without any additional parameters even 
+compared with non-bayesian methods. However, for such methods, the ambiguity obtained is
+% Aleatoric & Epistemic uncertainty needs more explanation
+not a direct representation of the \textit{Aleatoric} uncertainty,
+the noise of data but \textit{epistemic} uncertainty, ambiguity in model
+\cite{kendall2017uncertainties}. Therefore, the resulted uncertainty could not
+be treated as the inter-reader variability but the reliability of the model itself.
+\cite{nair2018exploring}. Study by Alex Kendall and Yarin Gal \cite{kendall2017uncertainties} 
+combines both \textit{aleatoric} and \textit{epistemic} uncertainty in a unified framework 
+\paragraph{}
+Another study by \cite{zhang2020disentangling} used confusion matrices to
+model each annotator. They hold the assumption that there is one and
+only one ground truth annotation for an input of certain task settings and
+that annotations are noised approximation of that
+, which can be obtained by matrix multiplication of annotators' 
+confusion matrices with ground truth. Then, by letting two convolution neural network backbone
+where one outputs the estimated ground truth and the other accounts for the confusion matrices
+of each annotator, and by forcing the matrix multiplication of them to be similar to the
+real annotation, a unique ground truth could be learned by optimizing the cross entropy term
+and another regularization term that minimize the trace of the confusion matrices.
+Though the inter-observer variance not directly measured, the well-modeled annotators'
+confusion matrices could be utilized to produce further results
+as well as measurements of uncertainties.
+Nevertheless, the correctness of the assumption of this approach
+still remains to be verified and evaluated since there's no dataset available 
+that fulfils their requirement by the publish time of their work.
+\paragraph{}
+\textbf{TODO: }
+
+\section{Planned Method}
+\paragraph{}
+To model the inter-observer variability in the segmentation task, the most straight forward way is to 
+directly estimate the annotations by each experts separately, with each channels of 
+the probability map output representing one of them. However, since dice coefficient loss and cross entropy 
+assign equal weights to every target area, the area with most disagreement, 
+the area around the contour won't be handled carefully\cite{Kervadec_2021}.
+The second thought is to follow the metric given by \cite{qubiq} and directly optimize on it by estimate threshold 
+result of the averaged segmentation map at threshold value of $\frac{1}{M}, \frac{2}{M}, ..., \frac{M}{M}$, 
+where $M$ is the number of annotators. A preliminary result is obtained and shown in section 4.
+Inspired by the work by \cite{zhang2020disentangling}. 
+\section{Preliminary Results}
+\section{Evaluation}
+\textbf{TODO}
+
+\section{Problem Formulation}
+\begin{enumerate}
+    \item Achieve high performance under QUBIQ evaluation metrics.
+    \item Define a better metric for the assessment of uncertainties in medical image segmentation.
+    \item Derive a method for the measurement of data uncertainties.
+    \item Address uncertainties caused by inter-reader variations.
+\end{enumerate}
+
+\bibliographystyle{plain}
+\bibliography{M335}
+
+\end{document}
