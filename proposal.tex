@@ -33,10 +33,11 @@ the large and wide-existing inconsistency among annotations of biomedical struct
 could result in poor performance of supervised machine learning algorithms,
 which are known to be highly dependent on the quality of data as well as their annotations.
 To overcome it, the most straight forward and widely-adopted method 
-is take the majority vote of experts' annotations, treating every 
+is to take the majority vote of experts' annotations, treating every 
 experts' opinions equally significant\cite{6975210}, while STAPLE proposed by \cite{STAPLE} 
 evaluates reliability of annotators and assigns weights to each of them when 
-fusing annotations accordingly.
+fusing annotations accordingly. Both of the approaches focuses on per image annotation fusion
+while ignoring information across the whole dataset\cite{zhang2020disentangling}.
 Lately, a challenge about Quantification of uncertainty 
 in biomedical image segmentation has been carried
 out on the purpose of seeking measures to quantify the uncertainty of 
@@ -113,8 +114,14 @@ assign equal weights to every target area, the area with most disagreement,
 the area around the contour won't be handled carefully\cite{Kervadec_2021}.
 The second thought is to follow the metric given by \cite{qubiq} and directly optimize on it by estimate threshold 
 result of the averaged segmentation map at threshold value of $\frac{1}{M}, \frac{2}{M}, ..., \frac{M}{M}$, 
-where $M$ is the number of annotators. A preliminary result is obtained and shown in section 4.
-Inspired by the work by \cite{zhang2020disentangling}. 
+where $M$ is the number of annotators. A preliminary result is obtained and shown in section 4 using this method.
+\paragraph{}
+Another direction would be to follow the idea of \cite{zhang2020disentangling} and \cite{kohl2019probabilistic}, 
+dividing the architecture into two components. 
+While one accounts for generating estimated general segmentation map,
+the other models annotators in a unified or separated manner. On combining the two components, a consistent segmentation
+result based on each annotator could be obtained and various uncertainty metrics could be adopted for
+the evaluation of the correctness of the uncertainty.
 \section{Preliminary Results}
 \section{Evaluation}
 \textbf{TODO}
