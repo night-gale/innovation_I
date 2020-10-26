@@ -3,10 +3,11 @@
 \usepackage{cite}
 \usepackage{url}
 \usepackage{graphicx}
+\usepackage{float}
 \graphicspath{ {./figs/} }
 
 \title{Quantification of Uncertainty in Medical Image Segmentation}
-\author{Hao Wang, 11812301}
+\author{Hao Wang, Yunhao Luo}
 \date{October 2020}
 
 \begin{document}
@@ -65,21 +66,29 @@ observation error of observer and is irreducible even feeded with more data, whi
 close connection with inter-observer variations. As for \textit{epistemic}
 uncertainty, it refers to ambiguity of model prediction that can be reduce by feeding abundant data.
 An example of it is that a model trained on only part of a dataset may over-confidently
-predict unseen data into wrong classes. Recent development on bayesian neural network has made it possible
-to quantify the \textit{epistemic} uncertainty by replacing scalar parameters with distributions such that 
-the model outputs differs for each forward pass during test stage and that output variance reflects the 
-certainty of the model. Such uncertainty could also be exploited to estimate \textit{aleatoric} uncertainty.
-\cite{kohl2019probabilistic} proposed a method that involve uncertainties by
-deploying variational auto-encoder(VAE) into U-net, the widely used model in medical image segmentation. 
-The VAE here accounts for variations of annotations and represents an estimation of joint distribution that 
-includes every pixels of the segmentation map. The framework is capable of providing multiple segmentation 
-hypothesis with each estimating knowledge of an expert.
+predict unseen data into wrong classes. Recent development on 
+bayesian neural network has made it possible to quantify the 
+\textit{epistemic} uncertainty by replacing scalar parameters with distributions such that 
+the model outputs differ for each forward pass during test stage and 
+that outputs' variance reflects the predictive uncertainty of the model, which is could be 
+considered a combination of \textit{aleatoric} uncertainty and \textit{epistemic} uncertainty 
+and can be divided into two parts by the law of total variance with each part corresponding to 
+one of the uncertainties. It could also be exploited to estimate \textit{aleatoric} uncertainty by 
+minimizing the \textit{epistemic} uncertainty. \cite{kohl2019probabilistic} 
+proposed a method that involve uncertainties by deploying variational 
+auto-encoder(VAE) into U-net, the widely used model in medical image segmentation. 
+The VAE here accounts for variations of annotations and represents an 
+estimation of joint distribution that includes every pixels of the segmentation map. 
+The framework is capable of providing multiple segmentation 
+hypothesis with each of them estimating the knowledge of one expert.
 However, one of drawbacks of the bayesian approach is of the extra computation
-and excessive training time. Some recent studies proposed to use a dropout network,
-during the testing stage of which, the dropout is kept, predictions are sampled
-using Monte Carlo methods and various uncertainties are computed based on the sampled results.
-It is also reported that Effective performance can be achieved without any additional parameters even 
-compared with non-bayesian methods. However, for such methods, the ambiguity obtained is
+,excessive training time and implementation difficulty. 
+Some recent studies proposed to use a dropout network, during the testing stage of which, 
+the dropout is kept, predictions are sampled using Monte Carlo methods 
+and various uncertainties are computed based on the sampled results.
+It is also reported that Effective performance can be achieved 
+without any additional parameters even compared with non-bayesian methods. 
+However, for such methods, the ambiguity obtained is
 % Aleatoric & Epistemic uncertainty needs more explanation
 not a direct representation of the \textit{Aleatoric} uncertainty,
 the noise of data but \textit{epistemic} uncertainty, but a utilization of ambiguity in model
@@ -106,18 +115,24 @@ Nevertheless, the correctness of the assumption of this approach
 still remains to be verified and evaluated since there's no dataset available 
 that fulfils their requirement by the publish time of their work.
 \paragraph{}
-\textbf{TODO: }
+To address the multiple annotator variability, Shi Hu et al utilized the multiple annotator dataset
+to form a "ground truth" for aleatoric uncertainty. Then a supervised framework for estimate
+as well as qualify \textit{aleatoric} uncertain is proposed and combined with probabilistic U-Net
+to produce fine-grained uncertainty approximations\cite{hu2019supervised}. 
 
 \section{Planned Method}
 \paragraph{}
-To model the inter-observer variability in the segmentation task, the most straight forward way is to 
-directly estimate the annotations by each experts separately, with each channels of 
-the probability map output representing one of them. However, since dice coefficient loss and cross entropy 
+To model the inter-observer variability in the segmentation task, 
+the most straight forward way is to directly estimate the annotations
+ by each experts separately, with each channels of the probability 
+ map output representing one of them. However, since dice coefficient loss and cross entropy 
 assign equal weights to every target area, the area with most disagreement, 
 the area around the contour won't be handled carefully\cite{Kervadec_2021}.
-The second thought is to follow the metric given by \cite{qubiq} and directly optimize on it by estimate threshold 
-result of the averaged segmentation map at threshold value of $\frac{1}{M}, \frac{2}{M}, ..., \frac{M}{M}$, 
-where $M$ is the number of annotators. A preliminary result is obtained and shown in section 4 using this method.
+The second thought is to follow the metric given by \cite{qubiq} and directly 
+optimize on it by estimate threshold result of the averaged segmentation map 
+at threshold value of $\frac{1}{M}, \frac{2}{M}, ..., \frac{M}{M}$, 
+where $M$ is the number of annotators. A preliminary result is obtained and 
+shown in section 4 using this method.
 \begin{equation}
     y_{p} = \{y_{p\frac{1}{M}}, y_{p\frac{2}{M}}, ... y_{p\frac{M-1}{M}},y_{p\frac{M}{M}}\}
 \end{equation}
@@ -132,33 +147,56 @@ where $M$ is the number of annotators. A preliminary result is obtained and show
 \end{equation}
 where $y_p$ is the prediction with each
 channel representing an estimation of threshold binary segmentation map, 
-$y_g$ the ground truth binary segmentation map with corresponded threshold value as $y_p$ and $\epsilon$ is the 
-smooth factor that smooths the trainning process by avoiding fluctuation caused by division of small value.
-$L$ is the loss function that maximize the similarity between $y_p$ and $y_g$ using soft dice coefficient 
+$y_g$ the ground truth binary segmentation map with corresponded threshold 
+value as $y_p$ and $\epsilon$ is the smooth factor that smooths 
+the training process by avoiding fluctuation caused by division of small value.
+$L$ is the loss function that maximize the similarity 
+between $y_p$ and $y_g$ using soft dice coefficient 
 to be optimized with stochastic gradient descend. 
 \paragraph{}
-Another direction would be to follow the idea of \cite{zhang2020disentangling} and \cite{kohl2019probabilistic}, 
+Another direction would be to follow the idea of 
+\cite{zhang2020disentangling} and \cite{kohl2019probabilistic}, 
 dividing the architecture into two components. 
-While one accounts for generating estimated general segmentation map,
-the other models annotators in a unified or separated manner. On combining the two components, a consistent segmentation
-result based on each annotator could be obtained and various uncertainty metrics could be adopted for
-the evaluation of the correctness of the uncertainty. For example, since the desired \textit{aleatoric} uncertainty can be 
+While one accounts for generating estimated "ground truth" segmentation map,
+the other models annotators in a unified or separated manner. On combining 
+the two components, a consistent segmentation result based on each annotator 
+could be obtained and various uncertainty metrics could be adopted for
+the evaluation of the correctness of the uncertainty. For example,
+since the desired \textit{aleatoric} uncertainty can be 
 estimated given the annotations of a image annotated by multiple experts\cite{qubiq}, 
 by quantifying the difference between the ground truth uncertainty and 
 the uncertainty computed out of the prediction, we can measure the goodness and the correctness of
-result. On top of that, a objective function targeted at minimizing the difference could be proposed and adopted.
+result. On top of that, a objective function targeted at 
+minimizing the difference could be proposed and adopted. The only problem would be the 
+extremely small amount of data, which may leads to high \textit{epistemic} uncertainty and 
+poor estimates of \textit{aleatoric}, the desired uncertainty. Therefore, the key of this approach 
+is to properly handle the difficulties caused by insufficient data.
 
-\paragraph{}
 \section{Preliminary Results and Analysis}
-\begin{figure}[h!]
+\begin{figure}[hb!]
 \centering
-\includegraphics[scale=0.3]{fig1.jpg}
-\caption{The Results of \textit{Brain Growth} task on the Validation Set of QUBIQ dataset with 7 annotators. a) is the brain 
-MRI scan of a participant. b) is the predicted sigmoid output at threshold value $\frac{1}{7}$ and $\frac{2}{7}$. c) the 
+\includegraphics[scale=0.28]{fig1.jpg}
+\caption{The Results of \textit{Brain Growth} task on the Validation Set of 
+QUBIQ dataset with 7 annotators. a) is the brain 
+MRI scan of a participant. b) is the predicted sigmoid output of threshold 
+value $\frac{1}{7}$ and $\frac{2}{7}$. c) the 
 ground truth segmentation map at same threshold values with b).}
+\label{pre_results}
 \end{figure}
+\paragraph{}
+This part we demonstrate some of the preliminary results obtained on the QUBIQ uncertainty dataset.
+The result shown in figure \ref{pre_results} is obtained using the method mentioned in the previous 
+section without pretraining nor data augmentation, which has 
+a averaged dice score of 0.7702 under the evaluation metric of the challenge. 
+Though it could be considered a medium-level result for a segmentation task especially for such
+a small amount of data samples, as for uncertainty, most of the uncertain pixels around the contour area are not 
+correctly approximated, which reflects the weakness of the objective of 
+being not focused enough on uncertain data point or could be considered a high \textit{epistemic} uncertainty. 
+More weights should be assigned to those pixels with high inter-reader variability. Pretraining on 
+related single annotator dataset may also help to reduce the difference between 
+prediction and ground truth discrete \textit{aleatoric} uncertainty.
 \section{Evaluation}
-\textbf{TODO}
+\textit{TODO}
 
 % TODO
 % Problem Formulation
