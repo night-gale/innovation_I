@@ -2,6 +2,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{cite}
 \usepackage{url}
+\usepackage{graphicx}
+\graphicspath{ {./figs/} }
 
 \title{Quantification of Uncertainty in Medical Image Segmentation}
 \author{Hao Wang, 11812301}
@@ -115,24 +117,56 @@ the area around the contour won't be handled carefully\cite{Kervadec_2021}.
 The second thought is to follow the metric given by \cite{qubiq} and directly optimize on it by estimate threshold 
 result of the averaged segmentation map at threshold value of $\frac{1}{M}, \frac{2}{M}, ..., \frac{M}{M}$, 
 where $M$ is the number of annotators. A preliminary result is obtained and shown in section 4 using this method.
+\begin{equation}
+    y_{p} = \{y_{p\frac{1}{M}}, y_{p\frac{2}{M}}, ... y_{p\frac{M-1}{M}},y_{p\frac{M}{M}}\}
+\end{equation}
+\begin{equation}
+    y_{g} = \{y_{g\frac{1}{M}}, y_{g\frac{2}{M}}, ... y_{g\frac{M-1}{M}},y_{g\frac{M}{M}}\}
+\end{equation}
+\begin{equation}
+    L = 1 - \frac{1}{NM}\sum_{n=1}^{N}\sum_{m=1}^{M}SoftDice(y_{p\frac{m}{M}}^{(n)}, y_{g\frac{m}{M}}^{(n)})
+\end{equation}
+\begin{equation}
+    SoftDice(y_p, y_g) = \frac{2\sum y_p y_g}{\sum y_p +  \sum y_g + \epsilon}
+\end{equation}
+where $y_p$ is the prediction with each
+channel representing an estimation of threshold binary segmentation map, 
+$y_g$ the ground truth binary segmentation map with corresponded threshold value as $y_p$ and $\epsilon$ is the 
+smooth factor that smooths the trainning process by avoiding fluctuation caused by division of small value.
+$L$ is the loss function that maximize the similarity between $y_p$ and $y_g$ using soft dice coefficient 
+to be optimized with stochastic gradient descend. 
 \paragraph{}
 Another direction would be to follow the idea of \cite{zhang2020disentangling} and \cite{kohl2019probabilistic}, 
 dividing the architecture into two components. 
 While one accounts for generating estimated general segmentation map,
 the other models annotators in a unified or separated manner. On combining the two components, a consistent segmentation
 result based on each annotator could be obtained and various uncertainty metrics could be adopted for
-the evaluation of the correctness of the uncertainty.
-\section{Preliminary Results}
+the evaluation of the correctness of the uncertainty. For example, since the desired \textit{aleatoric} uncertainty can be 
+estimated given the annotations of a image annotated by multiple experts\cite{qubiq}, 
+by quantifying the difference between the ground truth uncertainty and 
+the uncertainty computed out of the prediction, we can measure the goodness and the correctness of
+result. On top of that, a objective function targeted at minimizing the difference could be proposed and adopted.
+
+\paragraph{}
+\section{Preliminary Results and Analysis}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.3]{fig1.jpg}
+\caption{The Results of \textit{Brain Growth} task on the Validation Set of QUBIQ dataset with 7 annotators. a) is the brain 
+MRI scan of a participant. b) is the predicted sigmoid output at threshold value $\frac{1}{7}$ and $\frac{2}{7}$. c) the 
+ground truth segmentation map at same threshold values with b).}
+\end{figure}
 \section{Evaluation}
 \textbf{TODO}
 
-\section{Problem Formulation}
-\begin{enumerate}
-    \item Achieve high performance under QUBIQ evaluation metrics.
-    \item Define a better metric for the assessment of uncertainties in medical image segmentation.
-    \item Derive a method for the measurement of data uncertainties.
-    \item Address uncertainties caused by inter-reader variations.
-\end{enumerate}
+% TODO
+% Problem Formulation
+% \begin{enumerate}
+%    \item Achieve high performance under QUBIQ evaluation metrics.
+%    \item Define a better metric for the assessment of uncertainties in medical image segmentation.
+%    \item Derive a method for the measurement of data uncertainties.
+%    \item Address uncertainties caused by inter-reader variations.
+%\end{enumerate}
 
 \bibliographystyle{plain}
 \bibliography{M335}
