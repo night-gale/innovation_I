@@ -48,7 +48,7 @@ proposed for the assessment of participants' results, which
 takes in the averaged ground truth and the provided predicted probability map of a task
 and computes and averages the dice score of the threshold of them with
 discrete threshold values\cite{qubiq}. A high averaged dice score is then considered to 
-be an indicating of good quantification of the inter-observer uncertainty.
+be an indication of good quantification of the inter-observer uncertainty.
 Therefore, our goal is to firstly achieve a high score in the challenge. 
 Then, since taking threshold averaged dice score treats certain and uncertain pixels equally 
 and ignores the fact that most uncertain pixels lies around 
@@ -82,9 +82,10 @@ It is also reported that Effective performance can be achieved without any addit
 compared with non-bayesian methods. However, for such methods, the ambiguity obtained is
 % Aleatoric & Epistemic uncertainty needs more explanation
 not a direct representation of the \textit{Aleatoric} uncertainty,
-the noise of data but \textit{epistemic} uncertainty, ambiguity in model
-\cite{kendall2017uncertainties}. Therefore, the resulted uncertainty could not
-be treated as the inter-reader variability but the reliability of the model itself.
+the noise of data but \textit{epistemic} uncertainty, but a utilization of ambiguity in model
+\cite{kendall2017uncertainties} as an estimation. Therefore, the resulted uncertainty could not
+be treated as the inter-reader variability but the reliability of 
+the model itself when only insufficient data is provided. 
 \cite{nair2018exploring}. Study by Alex Kendall and Yarin Gal \cite{kendall2017uncertainties} 
 combines both \textit{aleatoric} and \textit{epistemic} uncertainty in a unified framework 
 \paragraph{}
