@@ -35,7 +35,7 @@ the large and wide-existing inconsistency among annotations of biomedical struct
 \cite{Variability2019}\cite{interobserver2018}. Such high-variance dataset 
 could result in poor performance of supervised machine learning algorithms,
 which are known to be highly dependent on the quality of data as well as their annotations.
-To overcome it, the most straight forward and widely-adopted method 
+To overcome it, the most straight-forward and widely-adopted method 
 is to take the majority vote of experts' annotations, treating every 
 experts' opinions equally significant\cite{6975210}, while STAPLE proposed by \cite{STAPLE} 
 evaluates reliability of annotators and assigns weights to each of them when 
@@ -78,13 +78,13 @@ combination of \textit{aleatoric} uncertainty and \textit{epistemic} uncertainty
 and can be divided into two parts by the law of total variance with each part corresponding to 
 one of the uncertainties. It could also be exploited to estimate \textit{aleatoric} uncertainty by 
 minimizing the \textit{epistemic} uncertainty. \cite{kohl2019probabilistic} 
-proposed a method that involve uncertainties by deploying variational 
+proposed a method that involves uncertainties by deploying variational 
 auto-encoder(VAE) into U-Net, the widely used model in medical image segmentation\cite{ronneberger2015unet}. 
 The VAE here accounts for variations of annotations and represents an 
 estimation of joint distribution that includes every pixels of the segmentation map. 
 The framework is capable of providing multiple segmentation 
 hypothesis with each of them estimating the knowledge of one expert.
-However, one of drawbacks of the bayesian approach is of the extra computation
+However, the drawbacks of the bayesian approach are of the extra computation
 ,excessive training time and implementation difficulty. 
 Some recent studies proposed to use a dropout network, during the testing stage of which, 
 the dropout is kept, predictions are sampled using Monte Carlo methods 
@@ -93,46 +93,46 @@ It is also reported that Effective performance can be achieved
 without any additional parameters even compared with non-bayesian methods. 
 However, for such methods, the ambiguity obtained is
 % Aleatoric & Epistemic uncertainty needs more explanation
-not a direct representation of the \textit{Aleatoric} uncertainty,
-the noise of data but \textit{epistemic} uncertainty, but a utilization of ambiguity in model
-\cite{kendall2017uncertainties} as an estimation. Therefore, the resulted uncertainty could not
+not a direct representation of the \textit{Aleatoric} uncertainty(the noise of data)
+, but \textit{epistemic} uncertainty in model
+\cite{kendall2017uncertainties}. Therefore, the resulted uncertainty could not
 be treated as the inter-reader variability but the reliability of 
 the model itself when only insufficient data is provided. 
-\cite{nair2018exploring}. Study by Alex Kendall and Yarin Gal \cite{kendall2017uncertainties} 
-combines both \textit{aleatoric} and \textit{epistemic} uncertainty in a unified framework 
+\cite{nair_precup_arnold_arbel_2020}. 
 \paragraph{}
 Another study by \cite{zhang2020disentangling} used confusion matrices to
 model each annotator. They hold the assumption that there is one and
 only one ground truth annotation for an input of certain task settings and
-that annotations are noised approximation of that
+that annotations are noised approximation of the ground truth
 , which can be obtained by matrix multiplication of annotators' 
-confusion matrices with ground truth. Then, by letting two convolution neural network backbone
+confusion matrices with ground truth. Then, with two convolution neural network backbone
 where one outputs the estimated ground truth and the other accounts for the confusion matrices
 of each annotator, and by forcing the matrix multiplication of them to be similar to the
 real annotation, a unique ground truth could be learned by optimizing the cross entropy term
-and another regularization term that minimize the trace of the confusion matrices.
-Though the inter-observer variance not directly measured, the well-modeled annotators'
+and another regularization term that minimizes the trace of the confusion matrices.
+Though the inter-observer variance is not directly measured, the well-modeled annotators'
 confusion matrices could be utilized to produce further results
 as well as measurements of uncertainties.
 Nevertheless, the correctness of the assumption of this approach
 still remains to be verified and evaluated since there's no dataset available 
 that fulfils their requirement by the publish time of their work.
 \paragraph{}
-To accurately model the multiple annotator variability, Shi Hu et al utilized the multiple annotator dataset
-to form a `ground truth" for aleatoric uncertainty. Then a supervised framework for estimate
-as well as qualify \textit{aleatoric} uncertain is proposed and combined with probabilistic U-Net
-to produce fine-grained uncertainty approximations\cite{hu2019supervised}. 
+To accurately model the multiple annotator variability, Shi Hu et al.\cite{hu2019supervised} utilized the multiple annotator dataset
+to form a `ground truth" for aleatoric uncertainty. Then a supervised framework for estimating
+as well as qualifying \textit{aleatoric} uncertain is proposed and combined with probabilistic U-Net
+to produce fine-grained uncertainty approximations. 
 
 \section{Planned Method}
 \paragraph{}
 To model the inter-observer variability in the segmentation task, 
-the most straight forward way is to directly estimate the annotations
+the most straight-forward way is to directly estimate the annotations
  by each experts separately, with each channels of the probability 
- map output of the deep model representing one of them. However, since dice coefficient loss and cross entropy 
-assign equal weights to every target area, the area with most disagreement, 
-the area around the contour won't be handled carefully\cite{Kervadec_2021}.
+ map output of the deep model representing them, respectively. 
+ However, since dice coefficient loss and cross entropy 
+assign equal weights to every target area, the area around the contour, 
+which has the most disagreement among experts, won't be handled carefully\cite{Kervadec_2021}.
 The second thought is to follow the metric given by \cite{qubiq} and directly 
-optimize on it by estimate threshold result of the averaged segmentation map 
+optimize on it by estimating threshold result of the averaged segmentation map 
 at threshold value of $\frac{1}{M}, \frac{2}{M}, ..., \frac{M}{M}$, 
 where $M$ is the number of annotators. A preliminary result is obtained and 
 shown in section 4 using this method and U-Net as backbone model.
@@ -149,11 +149,11 @@ shown in section 4 using this method and U-Net as backbone model.
     SoftDice(y_p, y_g) = \frac{2\sum y_p y_g}{\sum y_p +  \sum y_g + \epsilon}
 \end{equation}
 where $y_p$ is the prediction with each
-channel representing an estimation of threshold binary segmentation map, 
-$y_g$ the ground truth binary segmentation map with corresponded threshold 
-value as $y_p$ and $\epsilon$ is the smooth factor that smooths 
+channel representing an estimation of binary segmentation map at multiple threshold values, 
+$y_g$ the ground truth binary segmentation map with corresponding threshold 
+values as $y_p$ and $\epsilon$ is the smooth factor that smooths 
 the training process by avoiding fluctuation caused by division of small value.
-$L$ is the loss function that maximize the similarity 
+$L$ is the loss function that maximizes the similarity 
 between $y_p$ and $y_g$ using soft dice coefficient 
 to be optimized with stochastic gradient descend. 
 \paragraph{}
@@ -161,7 +161,7 @@ Another direction would be to follow the idea of
 \cite{zhang2020disentangling} and \cite{kohl2019probabilistic}, 
 dividing the architecture into two components. 
 While one accounts for generating estimated `ground truth" segmentation map,
-the other models annotators in a unified or separated manner. On combining 
+the other models annotators in a unified or separated manner. By combining 
 the two components, a consistent segmentation result based on each annotator 
 could be obtained and various uncertainty metrics could be adopted for
 the evaluation of the correctness of the uncertainty. For example,
@@ -169,46 +169,46 @@ since the desired \textit{aleatoric} uncertainty can be
 estimated given the annotations of an image annotated by multiple experts\cite{qubiq}, 
 by quantifying the difference between the ground truth uncertainty and 
 the uncertainty computed out of the prediction, we can measure the goodness and the correctness of
-result. On top of that, an objective function targeted at 
-minimizing the difference could be proposed and adopted. The only problem would be the 
-extremely small amount of data, which may leads to high \textit{epistemic} uncertainty and 
-poor estimates of \textit{aleatoric}, the desired uncertainty. Therefore, the key of this approach 
+results. On top of that, an objective function targeted at 
+minimizing the difference could be adopted. The only problem would be the 
+extremely small amount of data, which may lead to high \textit{epistemic} uncertainty and 
+poor estimates of \textit{aleatoric}(the desired uncertainty). Therefore, the key of this approach 
 is to properly handle the difficulties caused by insufficient data.
 
 \section{Preliminary Results and Analysis}
 \begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.28]{fig1.jpg}
-\caption{The Results of \textit{Brain Growth} task on the Validation Set of 
+\caption{The results of \textit{Brain Growth} task on the validation set of 
 QUBIQ dataset with 7 annotators. a) is the brain 
-MRI scan of a participant. b) is the predicted sigmoid output of threshold 
-value $\frac{1}{7}$ and $\frac{2}{7}$. c) the 
+MRI scan of a participant. b) is the predicted sigmoid output. The top row represents output at threshold  
+value of $\frac{1}{7}$ and the bottom one represents output at threshold value of $\frac{2}{7}$. c) is the 
 ground truth segmentation map at same threshold values with b).}
 \label{pre_results}
 \end{figure}
 \paragraph{}
 This part we demonstrate some of the preliminary results obtained on the QUBIQ uncertainty dataset.
-The result shown in figure \ref{pre_results} is obtained using the method mentioned in the previous 
-section without pretraining nor data augmentation, which has 
+The result shown in Figure \ref{pre_results} is obtained using the method mentioned in the previous 
+section without pre-training nor data augmentation, which has 
 a averaged dice score of 0.7702 under the evaluation metric of the challenge. 
-Though it could be considered a medium-level result for a segmentation task especially for such
+Though it could be considered a medium-level result for a segmentation task, especially for such
 a small amount of data samples, as for uncertainty, most of the uncertain pixels around the contour area are not 
 correctly approximated, which reflects the weakness of the objective of 
 being not focused enough on uncertain data point or could be considered a high \textit{epistemic} uncertainty. 
-More weights should be assigned to those pixels with high inter-reader variability. Pretraining on 
-related single annotator dataset may also help to reduce the difference between 
+Larger weights should be assigned to those pixels with high inter-reader variability. Pretraining on 
+related single annotator dataset may also help reduce the difference between 
 prediction and ground truth discrete \textit{aleatoric} uncertainty.
-\section{Evaluation}
+\section{Evaluation Metrics}
 \paragraph{}
 Based on the metric provided by \cite{qubiq}, a naive evaluation of our result could be given by:
 \begin{equation}
     S = \frac{1}{TNH}\sum_{t=1}^{T}\sum_{n=1}^{N}\sum_{h=1}^{H}DiceCoef(y_{p\frac{h}{H}}^{(t)}, y_{g\frac{h}{H}}^{(t)})
 \end{equation}
-where T is total number of tasks, N is the size the validation set and H refers to 
-the number of threshold values or could be considered a discrete estimation of quality of the cumulative probability 
+where T is total number of tasks, N is the size of the validation set and H refers to 
+the number of threshold values. It could be considered a discrete estimation of quality of the cumulative probability 
 distribution.
 \paragraph{}
-To further explored the quality \textit{aleatoric} uncertainty as well as the accuracy and sample diversity, we plan to 
+To further explore the quality \textit{aleatoric} uncertainty as well as the accuracy and sample diversity, we plan to 
 adopt the generalized energy distance metric, that has the form:
 \begin{equation}
     D^2_{GED} = 2E[d(S, Y)] - E[d[S, S']] - E[d(Y, Y')]
@@ -217,9 +217,9 @@ adopt the generalized energy distance metric, that has the form:
     d(A, B) = 1 - IoU(A, B)
 \end{equation}
 where S is samples from the bayesian model or Monte Carlo dropout model, Y is the corresponding 
-annotations. The first term of GED accounts for the difference between sampled prediction
-and annotation. The rest terms quantifies the expected difference of the sampled predictions and 
-annotation among themselves. 
+annotations. The first term of GED accounts for the difference between sampled predictions
+and annotations. The rest terms quantify the expected difference of the sampled predictions and 
+annotations among themselves. 
 
 % TODO
 % Problem Formulation
