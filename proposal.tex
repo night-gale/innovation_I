@@ -129,6 +129,12 @@ to produce fine-grained uncertainty approximations.
 \caption{U-Net architecture\cite{iqbal_2018}}
 \label{pre_results}
 \end{figure}
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.25]{fig3.png}
+\caption{Our baseline method}
+\label{proposed_mothod}
+\end{figure}
 \paragraph{}
 To model the inter-observer variability in the segmentation task, 
 the most straight-forward way is to directly estimate the annotations
@@ -190,7 +196,7 @@ QUBIQ dataset with 7 annotators. a) is the brain
 MRI scan of a participant. b) is the predicted sigmoid output. The top row represents output at threshold  
 value of $\frac{1}{7}$ and the bottom one represents output at threshold value of $\frac{2}{7}$. c) is the 
 ground truth segmentation map at same threshold values with b).}
-\label{pre_results}
+\label{U-Net}
 \end{figure}
 \paragraph{}
 This part we demonstrate some of the preliminary results obtained on the QUBIQ uncertainty dataset.
