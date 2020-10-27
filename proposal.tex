@@ -17,17 +17,17 @@
 \textbf{TODO}
 \section{Introduction}
 \paragraph{}
-Recent development of deep learning algorithms has largely contributed to
+Recent development of deep learning algorithms has greatly contributed to
 the performance gain on natural image analysis, of which lots
-of algorithms has been proposed to address its classification and semantic
+of algorithms has been proposed to address image classification and semantic
 segmentation problems and large-scale datasets with abundant annotations have been
 carried out\cite{nair_precup_arnold_arbel_2020}.
 However, due to
 % inter-reader variations need more details and background
 both lack of annotations and high inter-reader variations\cite{zhang2020disentangling}
-in medical domain, the application of deep models into clinical diagnosis,
+in medical domain, the application of deep models on clinical diagnosis,
 which is known to be sensitive to false-positive and true-negative cases that may leads
-to severe consequences, is currently not feasible. 
+to severe consequences, is still a challenging problem.
 For instance, the inter-annotator difference of glioblastoma segmentation
 is pointed out to be in the range of 74-84\% \cite{6975210}.
 Researches on inter-observer variance also found out
@@ -39,9 +39,9 @@ To overcome it, the most straight forward and widely-adopted method
 is to take the majority vote of experts' annotations, treating every 
 experts' opinions equally significant\cite{6975210}, while STAPLE proposed by \cite{STAPLE} 
 evaluates reliability of annotators and assigns weights to each of them when 
-fusing annotations accordingly. Both of the approaches focuses on per image annotation fusion
+fusing annotations accordingly. Both of the approaches focus on per image annotation fusion
 while ignoring information across the whole dataset\cite{zhang2020disentangling}.
-Lately, a challenge about Quantification of uncertainty 
+Lately, a challenge about quantification of uncertainty 
 in biomedical image segmentation has been carried
 out on the purpose of seeking measures to quantify the uncertainty of 
 medical image annotation. A discrete approximation of the uncertainty is also
@@ -67,14 +67,13 @@ uncertainty and \textit{Epistemic} uncertainty \cite{kendall2017uncertainties}.
 \textit{Aleatoric} uncertainty or data uncertainty typically occurs during data sampling and
 observation error of observer and is irreducible even feeded with more data, which shares a
 close connection with inter-observer variations. As for \textit{epistemic}
-uncertainty, it refers to ambiguity of model prediction that can be reduce by feeding abundant data.
+uncertainty, it refers to ambiguity of model prediction that can be reduced by feeding abundant data.
 An example of it is that a model trained on only part of a dataset may over-confidently
 predict unseen data into wrong classes. Recent development on 
 bayesian neural network has made it possible to quantify the 
-uncertainty of model prediction by replacing scalar parameters with distributions such that 
-the model outputs differ for each forward pass during test stage and 
+uncertainty of model prediction by replacing scalar parameters with distributions such 
 that outputs' variance reflects the predictive uncertainty of the model since parameters are now sampled 
-from a "pre-defined" prior distribution, which could be considered a 
+from a `pre-defined" prior distribution, which could be considered a 
 combination of \textit{aleatoric} uncertainty and \textit{epistemic} uncertainty 
 and can be divided into two parts by the law of total variance with each part corresponding to 
 one of the uncertainties. It could also be exploited to estimate \textit{aleatoric} uncertainty by 
@@ -120,7 +119,7 @@ still remains to be verified and evaluated since there's no dataset available
 that fulfils their requirement by the publish time of their work.
 \paragraph{}
 To accurately model the multiple annotator variability, Shi Hu et al utilized the multiple annotator dataset
-to form a "ground truth" for aleatoric uncertainty. Then a supervised framework for estimate
+to form a `ground truth" for aleatoric uncertainty. Then a supervised framework for estimate
 as well as qualify \textit{aleatoric} uncertain is proposed and combined with probabilistic U-Net
 to produce fine-grained uncertainty approximations\cite{hu2019supervised}. 
 
@@ -161,23 +160,23 @@ to be optimized with stochastic gradient descend.
 Another direction would be to follow the idea of 
 \cite{zhang2020disentangling} and \cite{kohl2019probabilistic}, 
 dividing the architecture into two components. 
-While one accounts for generating estimated "ground truth" segmentation map,
+While one accounts for generating estimated `ground truth" segmentation map,
 the other models annotators in a unified or separated manner. On combining 
 the two components, a consistent segmentation result based on each annotator 
 could be obtained and various uncertainty metrics could be adopted for
 the evaluation of the correctness of the uncertainty. For example,
 since the desired \textit{aleatoric} uncertainty can be 
-estimated given the annotations of a image annotated by multiple experts\cite{qubiq}, 
+estimated given the annotations of an image annotated by multiple experts\cite{qubiq}, 
 by quantifying the difference between the ground truth uncertainty and 
 the uncertainty computed out of the prediction, we can measure the goodness and the correctness of
-result. On top of that, a objective function targeted at 
+result. On top of that, an objective function targeted at 
 minimizing the difference could be proposed and adopted. The only problem would be the 
 extremely small amount of data, which may leads to high \textit{epistemic} uncertainty and 
 poor estimates of \textit{aleatoric}, the desired uncertainty. Therefore, the key of this approach 
 is to properly handle the difficulties caused by insufficient data.
 
 \section{Preliminary Results and Analysis}
-\begin{figure}[hb!]
+\begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.28]{fig1.jpg}
 \caption{The Results of \textit{Brain Growth} task on the Validation Set of 
