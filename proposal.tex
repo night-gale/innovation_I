@@ -13,8 +13,17 @@
 \begin{document}
 
 \maketitle
-\section*{Abstract}
-\textbf{TODO}
+\begin{abstract}
+Recent years have witnessed the improvment of deep learning algorithms on natural image 
+analysis. However, constrained by inter-reader variability as well as short of annotations, 
+the deployment of deep models into clinical practice remains a challenging problem. Though various methods
+has been proposed to address the inter-oberver variability, the quantification of it hasn't been 
+studied extensively. Lately, a challenge named Quantification of Uncertainty in Biomedical Image Quantification challenge(QUBIQ)
+is carried out. After following the metrics given by QUBIQ and obtained preliminary results, we found that a high score 
+is not necessarily an good representation of inter-reader variability. Therefore, our goal is to 
+further explored the inter-reader variability and to adopt a more accurate metric for measurement. 
+Based on that, we can also explore a further optimized method. 
+\end{abstract}
 \section{Introduction}
 \paragraph{}
 Recent development of deep learning algorithms has greatly contributed to
@@ -58,8 +67,8 @@ Then, since taking threshold averaged dice score treats certain and uncertain pi
 and ignores the fact that most uncertain pixels lies around 
 the contour of the lesion area, we are expecting to have a
 better evaluation method for inter-reader variations as well as objective function for 
-optimization. Finally, based on the metrics we derive, a further
-optimized method could be explored and proposed.
+optimization. Finally, based on the metrics, a further
+optimized method could be explored.
 \section{Related Works}
 \paragraph{}
 Uncertainty in deep learning can be inclusively divided into \textit{Aleatoric}
