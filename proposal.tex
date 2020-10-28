@@ -14,125 +14,123 @@
 
 \maketitle
 \begin{abstract}
-Recent years have witnessed the improvment of deep learning algorithms on natural image 
-analysis. However, constrained by inter-reader variability as well as short of annotations, 
+Recent years have witnessed the improvement of deep learning algorithms on natural image 
+analysis. However, constrained by inter-rater variability as well as short of annotations, 
 the deployment of deep models into clinical practice remains a challenging problem. Though various methods
-has been proposed to address the inter-oberver variability, the quantification of it hasn't been 
+has been proposed to address the inter-rater variability, the quantification of it hasn't been 
 studied extensively. Lately, a challenge named Quantification of Uncertainty in Biomedical Image Quantification challenge(QUBIQ)
-is carried out. After following the metrics given by QUBIQ and obtained preliminary results, we found that a high score 
-is not necessarily an good representation of inter-reader variability. Therefore, our goal is to 
-further explored the inter-reader variability and to adopt a more accurate metric for measurement. 
-Based on that, we can also explore a further optimized method. 
+is carried out. After following the metrics given by QUBIQ and obtaining preliminary results, we found that a high score 
+is not necessarily an good representation of inter-rater variability. Therefore, our goal is to 
+further explore the inter-rater variability and to adopt a better metric for measurement of uncertainty. 
+Based on that, we will be able to propose a further optimized method. 
 \end{abstract}
 \section{Introduction}
 \paragraph{}
-Recent development of deep learning algorithms has greatly contributed to
-the performance gain on natural image analysis, of which lots
-of algorithms has been proposed to address image classification and semantic
-segmentation problems and large-scale datasets with abundant annotations have been
-carried out\cite{nair_precup_arnold_arbel_2020}.
+Recent development of deep learning algorithms has greatly improved 
+the performance on natural image analysis. 
+Adequate algorithms has been proposed to address image classification and semantic
+segmentation problems. Large-scale datasets with abundant annotations have also been
+published \cite{nair_precup_arnold_arbel_2020}.
 However, due to
 % inter-reader variations need more details and background
-both lack of annotations and high inter-reader variations\cite{zhang2020disentangling}
+lack of annotations and high inter-rater variations\cite{zhang2020disentangling}
 in medical domain, the application of deep models on clinical diagnosis,
-which is known to be sensitive to false-positive and true-negative cases that may leads
-to severe consequences, is still a challenging problem.
-For instance, the inter-annotator difference of glioblastoma segmentation
+% TODO:
+known to be sensitive to false-positive and true-negative cases, is still a challenging problem.
+For instance, the inter-rater variations of glioblastoma segmentation
 is pointed out to be in the range of 74-84\% \cite{6975210}.
-Researches on inter-observer variance also found out
-the large and wide-existing inconsistency among annotations of biomedical structures
-\cite{Variability2019}\cite{interobserver2018}. Such high-variance dataset 
+Studies on inter-rater variance also found that
+inconsistency among annotations of biomedical structures widely exists
+\cite{Variability2019}\cite{interobserver2018}. Such high-variant dataset 
 could result in poor performance of supervised machine learning algorithms,
 which are known to be highly dependent on the quality of data as well as their annotations.
 To overcome it, the most straight-forward and widely-adopted method 
 is to take the majority vote of experts' annotations, treating every 
-experts' opinions equally significant\cite{6975210}, while STAPLE proposed by \cite{STAPLE} 
+experts' opinions equally significant\cite{6975210}. Another method, STAPLE, proposed by \cite{STAPLE} 
 evaluates reliability of annotators and assigns weights to each of them when 
-fusing annotations accordingly. Both of the approaches focus on per image annotation fusion
+fusing annotations accordingly. However, both of the approaches focus on per image annotation fusion
 while ignoring information across the whole dataset\cite{zhang2020disentangling}.
-Lately, a challenge about quantification of uncertainty 
+In 2020, a challenge about quantification of uncertainty 
 in biomedical image segmentation has been carried
 out on the purpose of seeking measures to quantify the uncertainty of 
 medical image annotation. A discrete approximation of the uncertainty is also
-proposed for the assessment of participants' results, which
+proposed for the assessment of participants' results. It
 takes in the averaged ground truth and the provided predicted probability map of a task
-and computes and averages the dice score of the threshold of them with
-discrete threshold values\cite{qubiq} that could be considered as 
-measuring the quality of the predicted cumulative probability map in a discrete manner. 
+% TODO: explain threshold
+and computes average dice score for each threshold value respectively 
+\cite{qubiq}. 
 A high averaged dice score is then considered to be an indication of 
-good quantification of the inter-observer uncertainty.
-Therefore, our goal is to firstly follow the QUBIQ challenge and quantify the level of 
+good quantification of the inter-rater uncertainty.
+For the first step, our goal is to follow the QUBIQ challenge and quantify 
 uncertainties in biomedical image segmentation. 
-Then, since taking threshold averaged dice score treats certain and uncertain pixels equally 
-and ignores the fact that most uncertain pixels lies around 
-the contour of the lesion area, we are expecting to have a
-better evaluation method for inter-reader variations as well as objective function for 
-optimization. Finally, based on the metrics, a further
+However, the drawback for the QUBIQ evaluation metric is distinct: it 
+ignores the fact that most uncertain pixels lie around 
+the contour of the lesion area. Therefore we are expecting to have a
+better evaluation method for inter-rater variations as well as an objective function for 
+optimization. Finally, based on the metric, a further
 optimized method could be explored.
 \section{Related Works}
 \paragraph{}
-Uncertainty in deep learning can be inclusively divided into \textit{Aleatoric}
+Uncertainty in deep learning can be divided into \textit{Aleatoric}
 uncertainty and \textit{Epistemic} uncertainty \cite{kendall2017uncertainties}.
-\textit{Aleatoric} uncertainty or data uncertainty typically occurs during data sampling and
-observation error of observer and is irreducible even feeded with more data, which shares a
-close connection with inter-observer variations. As for \textit{epistemic}
-uncertainty, it refers to ambiguity of model prediction that can be reduced by feeding abundant data.
-An example of it is that a model trained on only part of a dataset may over-confidently
-predict unseen data into wrong classes. Recent development on 
-bayesian neural network has made it possible to quantify the 
-uncertainty of model prediction by replacing scalar parameters with distributions such 
-that outputs' variance reflects the predictive uncertainty of the model since parameters are now sampled 
-from a `pre-defined" prior distribution, which could be considered a 
-combination of \textit{aleatoric} uncertainty and \textit{epistemic} uncertainty 
-and can be divided into two parts by the law of total variance with each part corresponding to 
-one of the uncertainties. It could also be exploited to estimate \textit{aleatoric} uncertainty by 
-minimizing the \textit{epistemic} uncertainty. \cite{kohl2019probabilistic} 
+\textit{Aleatoric} uncertainty or data uncertainty typically occurs during data sampling and might be caused by 
+observers and sampling devices.
+Usually, it is irreducible even feeded with more data, which shares a
+close connection with inter-rater variations. On the other hand, \textit{Epistemic}
+uncertainty refers to ambiguity of model prediction that can be reduced by feeding abundant data.
+For example, a model trained on only part of a dataset may over-confidently
+predict unseen data into wrong classes. Recent research on 
+Bayesian Neural Network(BNN) has made it possible to quantify the 
+uncertainty of model prediction by replacing scalar parameters with probabilistic distributions. Since parameters are now sampled 
+from a `pre-defined" prior distribution, 
+the outputs' variance reflects the predictive uncertainty of the model and could be considered a 
+combination of \textit{aleatoric} uncertainty and \textit{epistemic} uncertainty. 
+Kohl et al.\cite{kohl2019probabilistic} 
 proposed a method that involves uncertainties by deploying variational 
 auto-encoder(VAE) into U-Net, the widely used model in medical image segmentation\cite{ronneberger2015unet}. 
 The VAE here accounts for variations of annotations and represents an 
 estimation of joint distribution that includes every pixels of the segmentation map. 
 The framework is capable of providing multiple segmentation 
-hypothesis with each of them estimating the knowledge of one expert.
-However, the drawbacks of the bayesian approach are of the extra computation
-,excessive training time and implementation difficulty. 
-Some recent studies proposed to use a dropout network, during the testing stage of which, 
-the dropout is kept, predictions are sampled using Monte Carlo methods 
-and various uncertainties are computed based on the sampled results.
-It is also reported that Effective performance can be achieved 
-without any additional parameters even compared with non-bayesian methods. 
+hypotheses with each of them estimating the knowledge of one expert.
+Some recent studies proposed to use a dropout network as an approximation of BNN by keeping dropout at test stage. 
+Predictions are sampled using Monte Carlo methods and various 
+uncertainties are computed based on the sampled results.
+It is also reported that effective performance can be achieved 
+without any additional parameters compared with non-Bayesian methods. 
 However, for such methods, the ambiguity obtained is
 % Aleatoric & Epistemic uncertainty needs more explanation
 not a direct representation of the \textit{Aleatoric} uncertainty(the noise of data)
 , but \textit{epistemic} uncertainty in model
-\cite{kendall2017uncertainties}. Therefore, the resulted uncertainty could not
-be treated as the inter-reader variability but the reliability of 
-the model itself when only insufficient data is provided. 
+\cite{kendall2017uncertainties}. 
+Therefore, when only insufficient data is provided, the resulted uncertainty could not
+be treated as the inter-rater variability but the reliability of 
+the model itself. 
 \cite{nair_precup_arnold_arbel_2020}. 
 \paragraph{}
-Another study by \cite{zhang2020disentangling} used confusion matrices to
-model each annotator. They hold the assumption that there is one and
-only one ground truth annotation for an input of certain task settings and
-that annotations are noised approximation of the ground truth
-, which can be obtained by matrix multiplication of annotators' 
-confusion matrices with ground truth. Then, with two convolution neural network backbone
+Another study by \cite{zhang2020disentangling} uses confusion matrices to
+model each annotator. They hold three assumptions: first, there is one and
+only one ground truth annotation for an input of certain task setting; 
+second, annotations are noised approximation of the ground truth;last, annotators could be modeled by confusion matrices.
+Then, annotations can be estimated by matrix multiplication of annotators'
+confusion matrices with ground truth. The framework has two convolution neural network backbone
 where one outputs the estimated ground truth and the other accounts for the confusion matrices
-of each annotator, and by forcing the matrix multiplication of them to be similar to the
-real annotation, a unique ground truth could be learned by optimizing the cross entropy term
-and another regularization term that minimizes the trace of the confusion matrices.
-Though the inter-observer variance is not directly measured, the well-modeled annotators'
+of each annotator. 
+A unique ground truth could be learned by minimizing the 
+cross entropy of the matrix multiplication result and the real annotation.
+Though the inter-rater variance is not directly measured, the well-modeled annotators'
 confusion matrices could be utilized to produce further results
 as well as measurements of uncertainties.
 Nevertheless, the correctness of the assumption of this approach
-still remains to be verified and evaluated since there's no dataset available 
+still remains to be verified since there's no dataset available 
 that fulfils their requirement by the publish time of their work.
 \paragraph{}
-To accurately model the multiple annotator variability, Shi Hu et al.\cite{hu2019supervised} utilized the multiple annotator dataset
-to form a `ground truth" for aleatoric uncertainty. Then a supervised framework for estimating
-as well as qualifying \textit{aleatoric} uncertain is proposed and combined with probabilistic U-Net
+To accurately model the inter-rater variability, Hu et al.\cite{hu2019supervised} utilized a multiple annotator dataset
+to produce a `ground truth" for \textit{Aleatoric} uncertainty. Then a supervised framework for estimating
+as well as quantifying \textit{Aleatoric} uncertain is proposed and combined with probabilistic U-Net
 to produce fine-grained uncertainty approximations. 
 
-\section{Planned Method}
-\begin{figure}[ht!]
+\section{Method}
+\begin{figure}[hb!]
 \centering
 \includegraphics[scale=0.28]{fig2.png}
 \caption{U-Net architecture\cite{iqbal_2018}}
@@ -140,19 +138,13 @@ to produce fine-grained uncertainty approximations.
 \end{figure}
 \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.25]{fig3.png}
+\includegraphics[scale=0.3]{fig3.png}
 \caption{Our baseline method}
 \label{proposed_mothod}
 \end{figure}
 \paragraph{}
-To model the inter-observer variability in the segmentation task, 
-the most straight-forward way is to directly estimate the annotations
- by each experts separately, with each channels of the probability 
- map output of the deep model representing them, respectively. 
- However, since dice coefficient loss and cross entropy 
-assign equal weights to every target area, the area around the contour, 
-which has the most disagreement among experts, won't be handled carefully\cite{Kervadec_2021}.
-The second thought is to follow the metric given by \cite{qubiq} and directly 
+To model the inter-rater variability in the segmentation task, 
+we follow the metric given by \cite{qubiq} and directly 
 optimize on it by estimating threshold result of the averaged segmentation map 
 at threshold value of $\frac{1}{M}, \frac{2}{M}, ..., \frac{M}{M}$, 
 where $M$ is the number of annotators. A preliminary result is obtained and 
@@ -177,27 +169,9 @@ the training process by avoiding fluctuation caused by division of small value.
 $L$ is the loss function that maximizes the similarity 
 between $y_p$ and $y_g$ using soft dice coefficient 
 to be optimized with stochastic gradient descend. 
-\paragraph{}
-Another direction would be to follow the idea of 
-\cite{zhang2020disentangling} and \cite{kohl2019probabilistic}, 
-dividing the architecture into two components. 
-While one accounts for generating estimated `ground truth" segmentation map,
-the other models annotators in a unified or separated manner. By combining 
-the two components, a consistent segmentation result based on each annotator 
-could be obtained and various uncertainty metrics could be adopted for
-the evaluation of the correctness of the uncertainty. For example,
-since the desired \textit{aleatoric} uncertainty can be 
-estimated given the annotations of an image annotated by multiple experts\cite{qubiq}, 
-by quantifying the difference between the ground truth uncertainty and 
-the uncertainty computed out of the prediction, we can measure the goodness and the correctness of
-results. On top of that, an objective function targeted at 
-minimizing the difference could be adopted. The only problem would be the 
-extremely small amount of data, which may lead to high \textit{epistemic} uncertainty and 
-poor estimates of \textit{aleatoric}(the desired uncertainty). Therefore, the key of this approach 
-is to properly handle the difficulties caused by insufficient data.
 
 \section{Preliminary Results and Analysis}
-\begin{figure}[ht!]
+\begin{figure}[hb!]
 \centering
 \includegraphics[scale=0.28]{fig1.jpg}
 \caption{The results of \textit{Brain Growth} task on the validation set of 
@@ -206,6 +180,22 @@ MRI scan of a participant. b) is the predicted sigmoid output. The top row repre
 value of $\frac{1}{7}$ and the bottom one represents output at threshold value of $\frac{2}{7}$. c) is the 
 ground truth segmentation map at same threshold values with b).}
 \label{U-Net}
+\end{figure}
+\begin{figure}[hb!]
+\begin{center}
+    \begin{tabular}{|| c c ||}
+       \hline
+       Task Number & mean Dice Score \\
+       \hline \hline
+        Brain-tumor Task 1 & 0.8999 \\
+        Brain-tumor Task 2 & 0.7512 \\
+        Brain-tumor Task 3 & 0.7878 \\
+        Kidney & 0.8479 \\
+        Brain-growth & 0.7702  \\
+        \hline \hline
+    \end{tabular}
+\end{center}
+\caption{Mean dice score under QUBIQ evaluation metric}
 \end{figure}
 \paragraph{}
 This part we demonstrate some of the preliminary results obtained on the QUBIQ uncertainty dataset.
@@ -216,7 +206,7 @@ Though it could be considered a medium-level result for a segmentation task, esp
 a small amount of data samples, as for uncertainty, most of the uncertain pixels around the contour area are not 
 correctly approximated, which reflects the weakness of the objective of 
 being not focused enough on uncertain data point or could be considered a high \textit{epistemic} uncertainty. 
-Larger weights should be assigned to those pixels with high inter-reader variability. Pretraining on 
+Larger weights should be assigned to those pixels with high inter-rater variability. Pretraining on 
 related single annotator dataset may also help reduce the difference between 
 prediction and ground truth discrete \textit{aleatoric} uncertainty.
 \section{Evaluation Metrics}
@@ -241,6 +231,33 @@ where S is samples from the bayesian model or Monte Carlo dropout model, Y is th
 annotations. The first term of GED accounts for the difference between sampled predictions
 and annotations. The rest terms quantify the expected difference of the sampled predictions and 
 annotations among themselves. 
+
+\section{Future Work}
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.3]{fig5.png}
+\caption{Future work overview}
+\label{future work}
+\end{figure}
+\paragraph{}
+Inspired by the idea of 
+\cite{zhang2020disentangling} and \cite{kohl2019probabilistic}, 
+we can divide the architecture into two components. 
+While one accounts for generating estimated `ground truth" segmentation map,
+the other models annotators in a unified or separated manner. By combining 
+the two components, a consistent segmentation result based on each annotator 
+could be obtained and various uncertainty metrics could be adopted for
+the evaluation of the correctness of the uncertainty. For example,
+since the desired \textit{aleatoric} uncertainty can be 
+estimated given the annotations of an image annotated by multiple experts\cite{qubiq}, 
+by quantifying the difference between the ground truth uncertainty and 
+the uncertainty computed out of the prediction, we can measure the goodness and the correctness of
+results. On top of that, an objective function targeted at 
+minimizing the difference could be adopted. The only problem would be the 
+extremely small amount of data, which may lead to high \textit{epistemic} uncertainty and 
+poor estimates of \textit{aleatoric}(the desired uncertainty). Therefore, the key of this approach 
+is to properly handle the difficulties caused by insufficient data.
+\paragraph{}
 
 % TODO
 % Problem Formulation
