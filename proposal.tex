@@ -8,7 +8,7 @@
 
 \title{Quantification of Uncertainty in Medical Image Segmentation}
 \author{Hao Wang, Yunhao Luo}
-\date{October 2020}
+\date{December 2020}
 
 \begin{document}
 
@@ -18,7 +18,7 @@ Recent years have witnessed the improvement of deep learning algorithms on natur
 analysis. However, constrained by inter-rater variability as well as short of annotations, 
 the deployment of deep models into clinical practice remains a challenging problem. Though various methods
 has been proposed to address the inter-rater variability, the quantification of it hasn't been 
-studied extensively. Lately, a challenge named Quantification of Uncertainty in Biomedical Image Quantification challenge(QUBIQ)
+studied extensively. Late on, a challenge named Quantification of Uncertainty in Biomedical Image Quantification(QUBIQ)
 is carried out. After following the metrics given by QUBIQ and obtaining preliminary results, we found that a high score 
 is not necessarily an good representation of inter-rater variability. Therefore, our goal is to 
 further explore the inter-rater variability and to adopt a better metric for measurement of uncertainty. 
@@ -142,12 +142,19 @@ to produce fine-grained uncertainty approximations.
 \caption{Our baseline method}
 \label{proposed_mothod}
 \end{figure}
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.3]{fig6.png}
+\caption{Second Design: Using \textit{CrossEntropy} as objective function. Reformulate the problem as multi-class segmentation}
+\label{leveling}
+\end{figure}
 \paragraph{}
 To model the inter-rater variability in the segmentation task, 
-we follow the metric given by \cite{qubiq} and directly 
-optimize on it by estimating threshold result of the averaged segmentation map 
-at threshold value of $\frac{1}{M}, \frac{2}{M}, ..., \frac{M}{M}$, 
-where $M$ is the number of annotators. A preliminary result is obtained and 
+we follow the metric given by \cite{qubiq} and estimate the threshold binary map at each probability level.
+of $\frac{1}{M}, \frac{2}{M}, ..., \frac{M}{M}$, 
+where $M$ is the number of annotators. It could be considered as the discrete cumulative distribution of 
+the uncertainty caused by inter-rater variability. Cumulative, which includes more information can 
+provide more context for estimation of uncertainty. A preliminary result is obtained and  
 shown in section 4 using this method and U-Net as backbone model.
 \begin{equation}
     y_{p} = \{y_{p\frac{1}{M}}, y_{p\frac{2}{M}}, ... y_{p\frac{M-1}{M}},y_{p\frac{M}{M}}\}
@@ -169,29 +176,32 @@ the training process by avoiding fluctuation caused by division of small value.
 $L$ is the loss function that maximizes the similarity 
 between $y_p$ and $y_g$ using soft dice coefficient 
 to be optimized with stochastic gradient descend. 
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.3]{fig7.png}
+\caption{Wrongly predicted pixels affect final result}
+\label{WrongResult}
+\end{figure}
+\paragraph{}
+However, since during training, no extra constrained is applied on inter-channel relations, the result could be 
+affected and unstable according to Figure.\ref{WrongResult}. To be more discriminative, we can reformulated the 
+problem as a multi-class segmentation problem, with each probability level as a class. Then, \textit{CrossEntropy} can 
+be used as the proxy objective function for optimization. The architecture is shown in Figure.\ref{leveling}
 
 \section{Preliminary Results and Analysis}
-\begin{figure}[hb!]
-\centering
-\includegraphics[scale=0.28]{fig1.jpg}
-\caption{The results of \textit{Brain Growth} task on the validation set of 
-QUBIQ dataset with 7 annotators. a) is the brain 
-MRI scan of a participant. b) is the predicted sigmoid output. The top row represents output at threshold  
-value of $\frac{1}{7}$ and the bottom one represents output at threshold value of $\frac{2}{7}$. c) is the 
-ground truth segmentation map at same threshold values with b).}
-\label{U-Net}
-\end{figure}
-\begin{figure}[hb!]
+\begin{figure}[ht!]
 \begin{center}
-    \begin{tabular}{|| c c ||}
+    \begin{tabular}{|| c | c | c ||}
        \hline
-       Task Number & mean Dice Score \\
+       Task Number & Threshold & Leveling \\
        \hline \hline
-        Brain-tumor Task 1 & 0.8999 \\
-        Brain-tumor Task 2 & 0.7512 \\
-        Brain-tumor Task 3 & 0.7878 \\
-        Kidney & 0.8479 \\
-        Brain-growth & 0.7702  \\
+        Brain-tumor Task 1 & 0.818 & \textbf{0.828} \\
+        Brain-tumor Task 2 & 0.847 & \textbf{0.869}\\
+        Brain-tumor Task 3 & \textbf{0.862} & 0.854\\
+        Kidney & \textbf{0.811} & 0.783 \\
+        Brain-growth & 0.509 & \textbf{0.542}  \\
+        Prostate 1 & 0.512 & \textbf{0.574} \\
+        Prostate 2 & 0.554 & \textbf{0.570} \\
         \hline \hline
     \end{tabular}
 \end{center}
@@ -204,11 +214,15 @@ section without pre-training nor data augmentation, which has
 a averaged dice score of 0.7702 under the evaluation metric of the challenge. 
 Though it could be considered a medium-level result for a segmentation task, especially for such
 a small amount of data samples, as for uncertainty, most of the uncertain pixels around the contour area are not 
-correctly approximated, which reflects the weakness of the objective of 
+correctly approximated. It's a reflection of the weakness of the objective of 
 being not focused enough on uncertain data point or could be considered a high \textit{epistemic} uncertainty. 
-Larger weights should be assigned to those pixels with high inter-rater variability. Pretraining on 
+Larger weights should be assigned to those pixels with high inter-rater variability. Pre-training on 
 related single annotator dataset may also help reduce the difference between 
-prediction and ground truth discrete \textit{aleatoric} uncertainty.
+prediction and ground truth \textit{aleatoric} uncertainty.
+\paragraph{}
+Since for task brain-tumor and kidney, there's only 3 annotators available, the advantage of \textit{CrossEntropy} as 
+multi-class objective function becomes less obvious. However, for Brain-growth and Prostate with more that 6 annotators, \textit{CrossEntropy}
+wins a large margin over threshold and channels-wise dice loss.
 \section{Evaluation Metrics}
 \paragraph{}
 Based on the metric provided by \cite{qubiq}, a naive evaluation of our result could be given by:
@@ -235,29 +249,16 @@ annotations among themselves.
 \section{Future Work}
 \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.3]{fig5.png}
+\includegraphics[scale=0.5]{fig5.png}
 \caption{Future work overview}
 \label{future work}
 \end{figure}
 \paragraph{}
-Inspired by the idea of 
-\cite{zhang2020disentangling} and \cite{kohl2019probabilistic}, 
-we can divide the architecture into two components. 
-While one accounts for generating estimated `ground truth" segmentation map,
-the other models annotators in a unified or separated manner. By combining 
-the two components, a consistent segmentation result based on each annotator 
-could be obtained and various uncertainty metrics could be adopted for
-the evaluation of the correctness of the uncertainty. For example,
-since the desired \textit{aleatoric} uncertainty can be 
-estimated given the annotations of an image annotated by multiple experts\cite{qubiq}, 
-by quantifying the difference between the ground truth uncertainty and 
-the uncertainty computed out of the prediction, we can measure the goodness and the correctness of
-results. On top of that, an objective function targeted at 
-minimizing the difference could be adopted. The only problem would be the 
-extremely small amount of data, which may lead to high \textit{epistemic} uncertainty and 
-poor estimates of \textit{aleatoric}(the desired uncertainty). Therefore, the key of this approach 
-is to properly handle the difficulties caused by insufficient data.
-\paragraph{}
+Inspired by the comparison of threshold and leveling, we can have a unified network that simultaneously 
+includes both context information as well as discriminative supervised signal for training the network. 
+Because threshold at different probability could be considered as discrete cumulative distribution of uncertainties and 
+leveling is discrete density function, it's natural for us to derive threshold from leveling and vice versa. Therefore, we 
+can have both information in a unified network and regularized the network to learn desired features.
 
 % TODO
 % Problem Formulation
