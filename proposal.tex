@@ -19,8 +19,8 @@ analysis. However, constrained by inter-rater variability as well as short of an
 the deployment of deep models into clinical practice remains a challenging problem. Though various methods
 has been proposed to address the inter-rater variability, the quantification of it hasn't been 
 studied extensively. Late on, a challenge named Quantification of Uncertainty in Biomedical Image Quantification(QUBIQ)
-is carried out. After following the metrics given by QUBIQ and obtaining preliminary results, we found that a high score 
-is not necessarily an good representation of inter-rater variability. Therefore, our goal is to 
+is carried out. Following the metrics given and after obtaining preliminary results, we found that a high score 
+is not necessarily a good representation of inter-rater variability. Therefore, our goal is to 
 further explore the inter-rater variability and to adopt a better metric for measurement of uncertainty. 
 Based on that, we will be able to propose a further optimized method. 
 \end{abstract}
@@ -28,7 +28,7 @@ Based on that, we will be able to propose a further optimized method.
 \paragraph{}
 Recent development of deep learning algorithms has greatly improved 
 the performance on natural image analysis. 
-Adequate algorithms has been proposed to address image classification and semantic
+Adequate algorithms have been proposed to address image classification and semantic
 segmentation problems. Large-scale datasets with abundant annotations have also been
 published \cite{nair_precup_arnold_arbel_2020}.
 However, due to
@@ -187,31 +187,33 @@ However, since during training, no extra constrained is applied on inter-channel
 affected and unstable according to Figure.\ref{WrongResult}. To be more discriminative, we can reformulated the 
 problem as a multi-class segmentation problem, with each probability level as a class. Then, \textit{CrossEntropy} can 
 be used as the proxy objective function for optimization. The architecture is shown in Figure.\ref{leveling}
+\paragraph{}
+To further imporve the performance of our method, we combine the above mentioned methods in a unified framework, named as Threshold\&Leveling.
+Computing threshold result based on single probability is not feasible requires a step function like activation function.
 
-\section{Preliminary Results and Analysis}
+\section{Results and Analysis}
 \begin{figure}[ht!]
 \begin{center}
-    \begin{tabular}{|| c | c | c ||}
+    \begin{tabular}{|| c | c | c | c ||}
        \hline
-       Task Number & Threshold & Leveling \\
+       Task Number & Threshold & Leveling & Threshold \& Leveling \\
        \hline \hline
-        Brain-tumor Task 1 & 0.818 & \textbf{0.828} \\
-        Brain-tumor Task 2 & 0.847 & \textbf{0.869}\\
-        Brain-tumor Task 3 & \textbf{0.862} & 0.854\\
-        Kidney & \textbf{0.811} & 0.783 \\
-        Brain-growth & 0.509 & \textbf{0.542}  \\
-        Prostate 1 & 0.512 & \textbf{0.574} \\
-        Prostate 2 & 0.554 & \textbf{0.570} \\
+        Brain-tumor Task 1 & 0.818 & \textbf{0.828} & 0.826 \\
+        Brain-tumor Task 2 & 0.847 & 0.869 & \textbf{0.922}\\
+        Brain-tumor Task 3 & \textbf{0.862} & 0.854 & \textbf{0.862}\\
+        Kidney & \textbf{0.811} & 0.783 & 0.783\\
+        Brain-growth & 0.509 & \textbf{0.542} & 0.500  \\
+        Prostate 1 & 0.512 & \textbf{0.574} & 0.561 \\
+        Prostate 2 & 0.554 & \textbf{0.570} & 0.563\\
         \hline \hline
     \end{tabular}
 \end{center}
 \caption{Mean dice score under QUBIQ evaluation metric}
 \end{figure}
 \paragraph{}
-This part we demonstrate some of the preliminary results obtained on the QUBIQ uncertainty dataset.
+This part we demonstrate our results obtained on the QUBIQ uncertainty dataset.
 The result shown in Figure \ref{pre_results} is obtained using the method mentioned in the previous 
-section without pre-training nor data augmentation, which has 
-a averaged dice score of 0.7702 under the evaluation metric of the challenge. 
+section without pre-training nor data augmentation.
 Though it could be considered a medium-level result for a segmentation task, especially for such
 a small amount of data samples, as for uncertainty, most of the uncertain pixels around the contour area are not 
 correctly approximated. It's a reflection of the weakness of the objective of 
@@ -222,7 +224,16 @@ prediction and ground truth \textit{aleatoric} uncertainty.
 \paragraph{}
 Since for task brain-tumor and kidney, there's only 3 annotators available, the advantage of \textit{CrossEntropy} as 
 multi-class objective function becomes less obvious. However, for Brain-growth and Prostate with more that 6 annotators, \textit{CrossEntropy}
-wins a large margin over threshold and channels-wise dice loss.
+wins a large margin over threshold and channels-wise dice loss. Judging from the characteristics of two type of 
+loss function, the results are reasonable since CrossEntropy loss assign equal weights to each probability level after reweighting while 
+DiceCoef loss focuses on the lesion area. 
+\paragraph{}
+The combined method mananged to imporve the performance on tasks with less annotations, which outcompetes the leveling method and also has 
+an edge over the threshold method. However, it fails to improve the performance on datasets with 
+more annotations for each image. The reason could be that threshold in the combined method puts extra 
+weights on the central parts which are more important for tasks with les annotations but becomes insignificant when
+the number of annotations per image increases. As a result, the extra supervised signal brought about by threshold 
+is not as effective as expected.
 \section{Evaluation Metrics}
 \paragraph{}
 Based on the metric provided by \cite{qubiq}, a naive evaluation of our result could be given by:
@@ -245,20 +256,6 @@ where S is samples from the bayesian model or Monte Carlo dropout model, Y is th
 annotations. The first term of GED accounts for the difference between sampled predictions
 and annotations. The rest terms quantify the expected difference of the sampled predictions and 
 annotations among themselves. 
-
-\section{Future Work}
-\begin{figure}[ht!]
-\centering
-\includegraphics[scale=0.5]{fig5.png}
-\caption{Future work overview}
-\label{future work}
-\end{figure}
-\paragraph{}
-Inspired by the comparison of threshold and leveling, we can have a unified network that simultaneously 
-includes both context information as well as discriminative supervised signal for training the network. 
-Because threshold at different probability could be considered as discrete cumulative distribution of uncertainties and 
-leveling is discrete density function, it's natural for us to derive threshold from leveling and vice versa. Therefore, we 
-can have both information in a unified network and regularized the network to learn desired features.
 
 % TODO
 % Problem Formulation
